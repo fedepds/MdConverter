@@ -1,0 +1,918 @@
+/* Único CSS del proyecto: importado una vez desde index.astro.
+   Nada de <style> por componente — Astro los scopea con un hash y rompería
+   los selectores que cruzan componentes ([data-state] lo pone Record.astro). */
+
+/* Fuentes por path absoluto: el CSS buildeado vive en /_astro/, un path
+   relativo daría 404. Self-hosted: la página que dice que tu archivo no
+   viaja no le pide una tipografía a un CDN ajeno. */
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-latin-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Courier Prime";
+  src: url("/fonts/courier-prime-latin-400.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Courier Prime";
+  src: url("/fonts/courier-prime-latin-700.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ============================================================
+   Sistema visual: DESIGN.md (extracción de apple.com), tema claro.
+
+   Un solo color de acción (--color-primary) y el resto en neutros —
+   Apple no tiene un semáforo de estados, así que la transacción se
+   cuenta en tinta y movimiento, no en color: elegido y subiendo son dos
+   grises, convirtiendo se distingue por el barrido, y el azul se guarda
+   entero para "listo". El único agregado fuera de lo documentado es
+   --color-danger: el brief no define ningún rojo de error porque es la
+   extracción de un sitio de marketing, y una herramienta transaccional
+   no puede salir sin uno. Se usa solo en [data-state="error"].
+
+   La tipografía es 100% Inter (sustituto de SF Pro) salvo el código
+   real (--font-mono), que sigue en Courier Prime — eso es contenido de
+   máquina, no identidad de marca, y hasta la documentación de Apple usa
+   monoespaciada ahí.
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* Color */
+  --color-primary: #0066cc;
+  --color-primary-focus: #0071e3;
+  --color-primary-on-dark: #2997ff;
+  --color-ink: #1d1d1f;
+  --color-body: #1d1d1f;
+  --color-body-on-dark: #ffffff;
+  --color-body-muted: #cccccc;
+  --color-ink-muted-80: #333333;
+  --color-ink-muted-48: #7a7a7a;
+  --color-divider-soft: #f0f0f0;
+  --color-hairline: #e0e0e0;
+  --color-canvas: #ffffff;
+  --color-canvas-parchment: #f5f5f7;
+  --color-surface-pearl: #fafafc;
+  --color-surface-tile-1: #272729;
+  --color-surface-tile-2: #2a2a2c;
+  --color-surface-tile-3: #252527;
+  --color-surface-black: #000000;
+  --color-surface-chip-translucent: #d2d2d7;
+  --color-on-primary: #ffffff;
+  --color-on-dark: #ffffff;
+
+  /* Único agregado fuera del token set documentado: ver comentario arriba. */
+  --color-danger: #ff3b30;
+  --color-on-danger: #ffffff;
+
+  /* Tipografía */
+  --font-primary: "Inter", system-ui, sans-serif;
+  --font-family-2: "Inter", system-ui, sans-serif;
+  --font-mono: "Courier Prime", ui-monospace, monospace;
+
+  --text-hero-display-size: 3.5rem;    --text-hero-display-lh: 1.07; --text-hero-display-ls: -0.28px;
+  --text-display-lg-size: 2.5rem;      --text-display-lg-lh: 1.1;   --text-display-lg-ls: 0;
+  --text-display-md-size: 2.125rem;    --text-display-md-lh: 1.47;  --text-display-md-ls: -0.374px;
+  --text-lead-size: 1.75rem;           --text-lead-lh: 1.14;        --text-lead-ls: 0.196px;
+  --text-lead-airy-size: 1.5rem;       --text-lead-airy-lh: 1.5;    --text-lead-airy-ls: 0;
+  --text-tagline-size: 1.3125rem;      --text-tagline-lh: 1.19;     --text-tagline-ls: 0.231px;
+  --text-body-strong-size: 1.0625rem;  --text-body-strong-lh: 1.24; --text-body-strong-ls: -0.374px;
+  --text-body-size: 1.0625rem;         --text-body-lh: 1.47;        --text-body-ls: -0.374px;
+  --text-dense-link-size: 1.0625rem;   --text-dense-link-lh: 2.41;  --text-dense-link-ls: 0;
+  --text-caption-size: 0.875rem;       --text-caption-lh: 1.43;     --text-caption-ls: -0.224px;
+  --text-caption-strong-size: 0.875rem; --text-caption-strong-lh: 1.29; --text-caption-strong-ls: -0.224px;
+  --text-button-large-size: 1.125rem;  --text-button-large-lh: 1;   --text-button-large-ls: 0;
+  --text-button-utility-size: 0.875rem; --text-button-utility-lh: 1.29; --text-button-utility-ls: -0.224px;
+  --text-fine-print-size: 0.75rem;     --text-fine-print-lh: 1;     --text-fine-print-ls: -0.12px;
+  --text-micro-legal-size: 0.625rem;   --text-micro-legal-lh: 1.3;  --text-micro-legal-ls: -0.08px;
+  --text-nav-link-size: 0.75rem;       --text-nav-link-lh: 1;       --text-nav-link-ls: -0.12px;
+
+  /* Cuánto tiñe el lavado de la entrada mientras la transacción corre. */
+  --wash-tint: 12%;
+
+  /* Íconos — trazo, no relleno. Tres tamaños, nada paralelo a la escala de
+     espaciado que ya existe. */
+  --icon-sm: 1rem;
+  --icon-md: 1.375rem;
+  --icon-lg: 1.75rem;
+
+  /* Espaciado — escala nombrada de DESIGN.md. */
+  --spacing-xxs: 0.25rem;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1.0625rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
+  --spacing-section: 5rem;
+
+  /* Radio — no existía antes salvo el anillo de foco. */
+  --radius-none: 0;
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius-lg: 18px;
+  --radius-pill: 9999px;
+  --radius-full: 9999px;
+
+  --layout-max-width: 75rem;
+  --header-height: 3.5rem;
+
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+  /* El único drop-shadow de Apple vive debajo de fotografía de producto.
+     Acá no hay fotografía de producto, así que el chrome nunca tira sombra. */
+  --shadow-chrome: none;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-canvas-parchment);
+  color: var(--color-ink);
+  font-family: var(--font-primary);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+  accent-color: var(--color-primary);
+  caret-color: var(--color-primary);
+  scrollbar-color: var(--color-ink-muted-48) var(--color-surface-pearl);
+}
+
+/* Las superficies que no dibujamos también son del sistema. */
+::selection {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* Único radio que no sale de la escala: el anillo de foco es más chico
+   que el piso de la escala (xs: 5px), y es una excepción a propósito. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.page {
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: calc(var(--header-height) + var(--spacing-xl)) var(--spacing-lg) var(--spacing-xxl);
+}
+
+/* ---------- Íconos ---------- */
+
+/* currentColor a propósito: un ícono adentro de un estado que cambia de
+   color (listo, error) se recolorea solo, sin regla extra por estado. */
+.icon {
+  width: var(--icon-md);
+  height: var(--icon-md);
+  flex-shrink: 0;
+}
+
+/* ---------- Barra superior fija ---------- */
+
+/* Vidrio esmerilado como en apple.com: fondo casi opaco, desenfoque detrás,
+   un filete fino que la separa de la página. */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-lg);
+  background: color-mix(in oklab, var(--color-canvas) 82%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--color-divider-soft);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  text-decoration: none;
+  color: var(--color-ink);
+}
+
+.brand-mark {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+.brand-mark svg { width: 100%; height: 100%; display: block; }
+
+.brand-name {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: var(--text-body-strong-size);
+  letter-spacing: -0.02em;
+}
+
+.header-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: var(--text-button-utility-size);
+  text-decoration: none;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  padding: var(--spacing-xxs) var(--spacing-md) var(--spacing-xxs) var(--spacing-md);
+  border-radius: var(--radius-pill);
+  transition: background-color 120ms ease;
+}
+.header-cta:hover { background: var(--color-primary-focus); }
+.header-cta .icon { width: var(--icon-sm); height: var(--icon-sm); }
+
+/* ---------- El hero ---------- */
+
+.hero {
+  text-align: center;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: var(--spacing-lg) 0 var(--spacing-xxl);
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: 0 0 var(--spacing-lg);
+  padding: var(--spacing-xxs) var(--spacing-md);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  background: var(--color-canvas);
+  font-size: var(--text-caption-size);
+  line-height: 1.3;
+  color: var(--color-ink-muted-80);
+}
+
+.hero-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.display {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw + 1rem, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.022em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lede {
+  margin: var(--spacing-xs) 0 0;
+  max-width: 68ch;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-lh);
+  letter-spacing: var(--text-body-ls);
+}
+
+.lede code { font-family: var(--font-mono); }
+
+.hero .lede {
+  margin-inline: auto;
+  margin-top: var(--spacing-md);
+  max-width: 46ch;
+  color: var(--color-ink-muted-48);
+  font-size: var(--text-body-strong-size);
+  text-wrap: pretty;
+}
+
+.head-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-xs) var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  font-size: var(--text-fine-print-size);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-muted-48);
+}
+
+.head-meta b {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ---------- El registro ---------- */
+
+.records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.record {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr minmax(9rem, 12rem) 1fr;
+  gap: 0 var(--spacing-lg);
+  padding-top: 4px;
+
+  --estado: var(--color-divider-soft);
+  --avance: 0;
+}
+
+.record[data-state="picked"]      { --estado: var(--color-ink-muted-48); --avance: var(--carga, 1); }
+.record[data-state="uploading"]   { --estado: var(--color-ink-muted-80); --avance: var(--subida, 0); }
+.record[data-state="converting"]  { --estado: var(--color-ink-muted-80); --avance: 1; }
+.record[data-state="done"]        { --estado: var(--color-primary);      --avance: 1; }
+.record[data-state="error"]       { --estado: var(--color-danger);       --avance: 1; }
+
+/* El riel: una sola barra que es toda la transacción. Pista y relleno son
+   los dos pseudoelementos del registro, así que no hay marcado de adorno. */
+.record::before,
+.record::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 4px;
+  pointer-events: none;
+}
+
+.record::before { background: var(--color-divider-soft); }
+
+.record::after {
+  background: var(--estado);
+  transform: scaleX(var(--avance));
+  transform-origin: left center;
+  transition:
+    transform 340ms var(--ease-standard),
+    background-color 240ms ease;
+}
+
+/* Convertir no tiene porcentaje: el servidor no informa avance. El riel
+   deja de mentir una fracción y barre. */
+.record[data-state="converting"]::after {
+  transform: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0 18%,
+    var(--color-ink-muted-80) 34% 66%,
+    transparent 82% 100%
+  );
+  background-size: 260% 100%;
+  animation: barrido 1.15s linear infinite;
+}
+
+@keyframes barrido {
+  from { background-position: -80% 0; }
+  to   { background-position: 180% 0; }
+}
+
+.zone {
+  padding: var(--spacing-lg);
+  min-width: 0;
+}
+
+/* Entrada y salida son tarjetas blancas flotando sobre el parchment de la
+   página, sin filete ni sombra — la distinción entre zonas es de
+   superficie, no de borde. */
+.zone-in,
+.zone-out {
+  background: var(--color-canvas);
+  border-radius: var(--radius-lg);
+}
+
+/* Mientras la transacción está en curso, la entrada se tiñe del tono de la
+   etapa. Lavado, no inundación: la región llena se la gana el resultado. */
+.zone-in { transition: background-color 260ms ease; }
+
+.record[data-state="picked"] .zone-in,
+.record[data-state="uploading"] .zone-in,
+.record[data-state="converting"] .zone-in {
+  background: color-mix(in oklab, var(--estado) var(--wash-tint), var(--color-canvas));
+}
+
+.zone-out {
+  position: relative;
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+/* La Regla del Medianil: entre entrada y salida siempre hay un canal que
+   dice qué pasó en el cruce. Acá es una banda plana de parchment, sin
+   radio, para que se lea como el paso entre dos tarjetas y no como una
+   tercera tarjeta. */
+.gutter {
+  padding: var(--spacing-lg) var(--spacing-md);
+  background: var(--color-canvas-parchment);
+  color: var(--color-ink-muted-80);
+  min-width: 0;
+}
+
+.zone-label,
+.gutter-label {
+  font-size: var(--text-fine-print-size);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-divider-soft);
+}
+
+.gutter-label { border-bottom-color: color-mix(in oklab, var(--color-ink-muted-80) 40%, transparent); }
+
+/* ---------- Campos ---------- */
+
+.fields { margin: 0; }
+
+.field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--spacing-xs);
+  align-items: baseline;
+  padding: var(--spacing-xxs) 0;
+  border-bottom: 1px solid var(--color-divider-soft);
+}
+
+.field:last-child { border-bottom: 0; }
+
+.field dt {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  font-size: var(--text-fine-print-size);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted-48);
+}
+
+.field dt .icon { width: var(--icon-sm); height: var(--icon-sm); }
+
+.field dd {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: var(--text-caption-strong-size);
+  line-height: var(--text-caption-strong-lh);
+  letter-spacing: var(--text-caption-strong-ls);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* El medianil no lista cifras medidas sino lo que se pierde, en prosa: va
+   apilado y en la cara de texto, no en la alineada a la derecha. */
+.gutter .field {
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xxs);
+  padding: var(--spacing-xs) 0;
+  border-bottom-color: color-mix(in oklab, var(--color-ink-muted-80) 28%, transparent);
+}
+.gutter .field dt,
+.gutter .field dd { color: var(--color-ink-muted-80); }
+.gutter .field dd {
+  font-family: var(--font-primary);
+  font-weight: 400;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-lh);
+  letter-spacing: var(--text-body-ls);
+  text-align: left;
+  padding-left: 1.1em;
+}
+
+/* ---------- Zona de entrada ---------- */
+
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  position: relative;
+  border: 1px dashed var(--color-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: var(--spacing-md);
+  background: transparent;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.drop:hover { background: color-mix(in oklab, var(--color-primary) 9%, var(--color-canvas)); }
+
+/* La ficha del ícono: un cuadrado claro que levanta el "subí un archivo"
+   del resto de la tarjeta, como la zona de carga de apple.com. */
+.drop-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: var(--spacing-xxs);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas-parchment);
+  color: var(--color-primary);
+  transition: transform 140ms var(--ease-standard);
+}
+.drop:hover .drop-icon { transform: translateY(-2px); }
+.drop-icon .icon { width: var(--icon-lg); height: var(--icon-lg); }
+
+.drop.dragover {
+  background: color-mix(in oklab, var(--color-primary) 16%, var(--color-canvas));
+  border-style: solid;
+  border-color: var(--color-primary);
+}
+
+/* El input está oculto pero sigue siendo lo que recibe el foco del teclado.
+   El anillo va sobre el rótulo, que es lo que se ve. */
+.drop:has(input:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.drop-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xxs);
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: var(--text-body-strong-size);
+  line-height: var(--text-body-strong-lh);
+  letter-spacing: var(--text-body-strong-ls);
+}
+
+.drop-hint {
+  display: block;
+  font-size: var(--text-caption-size);
+  color: var(--color-ink-muted-48);
+  margin-top: var(--spacing-xxs);
+}
+
+.drop input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ---------- Acciones ---------- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-md);
+}
+
+/* Botón primario de DESIGN.md: relleno azul, texto blanco, pill. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-lh);
+  letter-spacing: var(--text-body-ls);
+  min-height: 44px;
+  padding: 11px 22px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, transform 90ms ease;
+}
+
+.btn:hover { background: var(--color-primary-focus); }
+.btn:active { transform: translateY(1px); }
+
+.btn[hidden] { display: none; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn:disabled:hover { background: var(--color-primary); }
+
+/* Botón secundario pill: fondo blanco, texto azul. El borde es el único
+   apartamiento del componente literal de DESIGN.md — sin él, un botón
+   blanco sobre la tarjeta perla del fondo desaparece. */
+.btn-ghost {
+  background: var(--color-canvas);
+  color: var(--color-primary);
+  border: 1px solid var(--color-hairline);
+}
+.btn-ghost:hover { background: var(--color-canvas-parchment); }
+
+/* ---------- Estados ---------- */
+
+/* La firma del registro: no un adorno, el mismo mecanismo dibujado. Los seis
+   íconos están todos en el DOM, apilados; el que se ve es el que coincide
+   con data-state. currentColor hace que el flip a azul o rojo de más abajo
+   los recoloree gratis. */
+.state-icon {
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}
+
+.state-icon .icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 220ms var(--ease-standard);
+}
+
+.record[data-state="empty"]      .state-icon .icon[data-for="empty"]      { opacity: 1; }
+.record[data-state="picked"]     .state-icon .icon[data-for="picked"]     { opacity: 1; }
+.record[data-state="uploading"]  .state-icon .icon[data-for="uploading"]  { opacity: 1; }
+.record[data-state="converting"] .state-icon .icon[data-for="converting"] { opacity: 1; animation: respira 1.4s ease-in-out infinite; }
+.record[data-state="done"]       .state-icon .icon[data-for="done"]       { opacity: 1; }
+.record[data-state="error"]      .state-icon .icon[data-for="error"]      { opacity: 1; }
+
+@keyframes respira { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.state {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: var(--text-body-strong-size);
+  line-height: var(--text-body-strong-lh);
+  letter-spacing: var(--text-body-strong-ls);
+  font-variant-numeric: tabular-nums;
+  margin: 0 0 var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-divider-soft);
+}
+
+.zone-out .empty-note {
+  font-size: var(--text-caption-size);
+  color: var(--color-ink-muted-48);
+  margin: 0;
+}
+
+/* Vacío: la salida está rotulada y en blanco, y eso es la explicación. */
+.record[data-state="empty"] .out-fields,
+.record[data-state="empty"] .actions { display: none; }
+
+.record:not([data-state="empty"]) .empty-note { display: none; }
+
+/* El momento: el .md llega y la salida se pinta desde el medianil hacia
+   afuera, en el sentido en que corrió la conversión. Detrás del borde que
+   avanza entran las cinco cifras, una atrás de la otra. */
+.record[data-state="done"] .zone-out {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  animation: llegada 440ms var(--ease-standard) both;
+}
+
+@keyframes llegada {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+.record[data-state="done"] .out-field {
+  animation: fila 300ms var(--ease-standard) both;
+  animation-delay: calc(120ms + var(--i, 0) * 45ms);
+}
+
+@keyframes fila {
+  from { opacity: 0; transform: translateX(-0.75rem); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* El botón cierra la secuencia: primero se sabe qué salió, después se baja. */
+.record[data-state="done"] .zone-out .actions {
+  animation: fila 300ms var(--ease-standard) both;
+  animation-delay: 340ms;
+}
+
+.record[data-state="done"] .zone-out .zone-label,
+.record[data-state="done"] .zone-out .state {
+  border-bottom-color: color-mix(in oklab, var(--color-on-primary) 40%, transparent);
+}
+.record[data-state="done"] .out-field { border-bottom-color: color-mix(in oklab, var(--color-on-primary) 28%, transparent); }
+.record[data-state="done"] .out-field dt,
+.record[data-state="done"] .out-field dd { color: var(--color-on-primary); }
+
+.record[data-state="done"] .zone-out .btn {
+  background: var(--color-on-primary);
+  color: var(--color-primary);
+  border: none;
+}
+.record[data-state="done"] .zone-out .btn:hover {
+  background: transparent;
+  color: var(--color-on-primary);
+  border: 1px solid var(--color-on-primary);
+}
+
+/* La Regla de la Alarma Reservada: rojo solo en las fallas reales. Sin
+   coreografía — una falla no se celebra, aparece. */
+.record[data-state="error"] .zone-out {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+}
+.record[data-state="error"] .zone-out .zone-label,
+.record[data-state="error"] .zone-out .state {
+  border-bottom-color: color-mix(in oklab, var(--color-on-danger) 40%, transparent);
+}
+.record[data-state="error"] .out-fields { display: none; }
+.record[data-state="error"] .zone-out .btn {
+  background: var(--color-on-danger);
+  color: var(--color-danger);
+  border: none;
+}
+.record[data-state="error"] .zone-out .btn:hover {
+  background: transparent;
+  color: var(--color-on-danger);
+  border: 1px solid var(--color-on-danger);
+}
+
+.err-msg {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  margin: 0 0 var(--spacing-xs);
+  font-weight: 600;
+}
+.err-exit { margin: 0; font-size: var(--text-caption-size); }
+
+.record:not([data-state="error"]) .err { display: none; }
+.record[data-state="error"] .empty-note { display: none; }
+
+/* ---------- Las secciones de abajo ---------- */
+
+/* Misma retícula que el registro: columna de rótulo, columna de contenido,
+   filete fino entre secciones. No es un patrón nuevo — es el registro
+   contando algo que no es un archivo. A diferencia del registro, acá el
+   filete sí queda: son cuatro bloques de contenido sin relación entre sí,
+   no zonas de una misma transacción, así que el límite es legítimo. */
+
+.secciones {
+  margin-top: var(--spacing-xxl);
+  border-top: 1px solid var(--color-hairline);
+}
+
+.seccion {
+  display: grid;
+  grid-template-columns: minmax(9rem, 12rem) 1fr;
+  gap: 0 var(--spacing-lg);
+  padding: var(--spacing-lg) 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.seccion-label {
+  font-size: var(--text-fine-print-size);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-ink-muted-48);
+}
+
+.seccion-cuerpo { min-width: 0; }
+
+.seccion-lede {
+  margin: 0 0 var(--spacing-sm);
+  max-width: 68ch;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-lh);
+  letter-spacing: var(--text-body-ls);
+}
+
+.seccion code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+/* Cada sección ahora explica con ícono + rótulo corto, y el párrafo que
+   antes iba directo en la fila vive en <details> nativo — sin JS nuevo,
+   con foco y teclado gratis. */
+.seccion details {
+  border-bottom: 1px solid var(--color-divider-soft);
+}
+.seccion details:last-child { border-bottom: 0; }
+
+.seccion summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: var(--text-body-strong-size);
+  color: var(--color-ink);
+}
+.seccion summary::-webkit-details-marker { display: none; }
+
+.seccion summary .icon:not(.chev) { color: var(--color-ink-muted-48); }
+
+.seccion summary .chev {
+  margin-left: auto;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--color-ink-muted-48);
+  transition: transform 200ms var(--ease-standard);
+}
+.seccion details[open] summary .chev { transform: rotate(90deg); }
+
+.seccion details p {
+  margin: 0 0 var(--spacing-md);
+  max-width: 68ch;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-lh);
+  letter-spacing: var(--text-body-ls);
+  color: var(--color-ink-muted-80);
+}
+
+/* #privacidad: un claim corto por fila, detalle a un clic. */
+.claim-chips { list-style: none; margin: 0; padding: 0; }
+.claim-chips summary .icon:not(.chev) { color: var(--color-primary); }
+
+/* ---------- Pie ---------- */
+
+.site-footer {
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xs) var(--spacing-lg);
+  border-top: 1px solid var(--color-divider-soft);
+  font-size: var(--text-caption-size);
+  color: var(--color-ink-muted-48);
+}
+
+.site-footer p {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+}
+
+.site-footer .icon { width: var(--icon-sm); height: var(--icon-sm); }
+.site-footer a { color: var(--color-ink-muted-80); text-decoration: none; }
+.site-footer a:hover { color: var(--color-ink); text-decoration: underline; }
+
+/* Menos movimiento, no menos información: el riel sigue midiendo y los
+   colores siguen cambiando; se van el barrido, el pintado y el desplazamiento. */
+@media (prefers-reduced-motion: reduce) {
+  .record[data-state="converting"]::after {
+    background: var(--estado);
+    animation: pulso 2s ease-in-out infinite;
+  }
+  @keyframes pulso { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+  .record[data-state="done"] .zone-out { animation: none; }
+  .record[data-state="done"] .out-field,
+  .record[data-state="done"] .zone-out .actions {
+    animation-name: aparece;
+    animation-duration: 160ms;
+  }
+  @keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+
+  .record[data-state="converting"] .state-icon .icon[data-for="converting"] { animation: none; }
+  .state-icon .icon { transition-duration: 1ms; }
+
+  .btn:active { transform: none; }
+  .drop:hover .drop-icon { transform: none; }
+}
+
+/* Al angostarse, las zonas colapsan a bandas apiladas y el medianil pasa a
+   ser la banda horizontal que las separa. La estructura no cambia. */
+@media (max-width: 46rem) {
+  .site-header { padding: 0 var(--spacing-md); }
+  .site-footer { justify-content: center; text-align: center; }
+  .record { grid-template-columns: 1fr; }
+  .seccion {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm) 0;
+  }
+  .record[data-state="done"] .zone-out { animation-name: llegada-vertical; }
+  @keyframes llegada-vertical {
+    from { clip-path: inset(0 0 100% 0); }
+    to   { clip-path: inset(0 0 0 0); }
+  }
+}

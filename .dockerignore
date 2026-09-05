@@ -1,0 +1,9 @@
+**/node_modules
+**/.venv
+**/__pycache__
+**/*.pyc
+astro/web/dist
+astro/web/.astro
+.impeccable
+.git
+CLAUDE.md

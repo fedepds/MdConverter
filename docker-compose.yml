@@ -1,0 +1,8 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      MAX_FILE_SIZE_MB: 25
+      CONVERT_TIMEOUT_SECONDS: 60

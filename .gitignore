@@ -1,0 +1,13 @@
+# python
+.venv/
+__pycache__/
+*.pyc
+
+.DS_Store
+.vscode/
+CLAUDE.md
+AGENTS.md
+DESING.md
+PRODUCT.md
+.impeccable
+.playwright-mcp/

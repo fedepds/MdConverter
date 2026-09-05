@@ -1,0 +1,102 @@
+---
+// Un registro: entrada · medianil (la pérdida) · salida.
+// El data-state lo maneja src/scripts/convert.js; el CSS de global.css
+// cuelga de él. Hoy hay una sola fila, mañana la lista crece sin rehacer nada.
+import Icon from "./Icon.astro";
+
+const ENTRADA = [
+  { k: "name", label: "archivo", icon: "file" },
+  { k: "ext", label: "extensión", icon: "extension" },
+  { k: "size", label: "bytes", icon: "weight" },
+];
+
+const PERDIDA = [
+  { icon: "eye-off", label: "formato visual", valor: "negritas, tipografías, colores" },
+  { icon: "heading", label: "paginación", valor: "saltos de página, encabezados" },
+  { icon: "file", label: "imágenes", valor: "no se extrae su texto" },
+];
+
+const SALIDA = [
+  { k: "lines", label: "líneas", icon: "list" },
+  { k: "headings", label: "encabezados", icon: "heading" },
+  { k: "tables", label: "tablas", icon: "table" },
+  { k: "links", label: "enlaces", icon: "link" },
+  { k: "bytes", label: "peso .md", icon: "weight" },
+];
+---
+
+<li class="record" data-state="empty">
+  <div class="zone zone-in">
+    <h2 class="zone-label">Entrada — tu archivo</h2>
+
+    <label class="drop" for="file">
+      <span class="drop-icon" aria-hidden="true"><Icon name="upload" /></span>
+      <span class="drop-title">Elegí un archivo</span>
+      <span class="drop-hint" data-f="hint">o arrastralo acá</span>
+      <input type="file" id="file" name="file" />
+    </label>
+
+    <dl class="fields">
+      {ENTRADA.map(({ k, label, icon }) => (
+        <div class="field">
+          <dt><Icon name={icon} />{label}</dt>
+          <dd data-f={k}>—</dd>
+        </div>
+      ))}
+    </dl>
+
+    <div class="actions">
+      <button type="button" class="btn" data-a="convert"><Icon name="upload" />Convertir</button>
+      <button type="button" class="btn btn-ghost" data-a="reset"><Icon name="trash" />Descartar</button>
+    </div>
+  </div>
+
+  <div class="gutter">
+    <h2 class="gutter-label">Pérdida — esperada</h2>
+    <dl class="fields">
+      {PERDIDA.map(({ icon, label, valor }) => (
+        <div class="field">
+          <dt><Icon name={icon} />{label}</dt>
+          <dd>{valor}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+
+  <div class="zone zone-out">
+    <span class="state-icon" aria-hidden="true">
+      <Icon name="file" data-for="empty" />
+      <Icon name="file" data-for="picked" />
+      <Icon name="upload" data-for="uploading" />
+      <Icon name="clock" data-for="converting" />
+      <Icon name="check" data-for="done" />
+      <Icon name="warning" data-for="error" />
+    </span>
+    <h2 class="zone-label">Salida — el .md</h2>
+    <p class="state" data-f="state">sin convertir</p>
+
+    <p class="empty-note">
+      Acá se escribe el recuento de lo que salió: líneas, encabezados, tablas,
+      enlaces y peso del <code>.md</code>.
+    </p>
+
+    <div class="err" role="alert">
+      <p class="err-msg"><Icon name="warning" /><span data-f="err">—</span></p>
+      <p class="err-exit" data-f="exit">—</p>
+    </div>
+
+    <dl class="fields out-fields">
+      {SALIDA.map(({ k, label, icon }, i) => (
+        <div class="field out-field" style={`--i:${i}`}>
+          <dt><Icon name={icon} />{label}</dt>
+          <dd data-f={k}>—</dd>
+        </div>
+      ))}
+    </dl>
+
+    <div class="actions">
+      <button type="button" class="btn" data-a="download" hidden><Icon name="download" />Descargar .md</button>
+      <button type="button" class="btn" data-a="retry" hidden><Icon name="retry" />Reintentar</button>
+    </div>
+  </div>
+</li>
