@@ -19,7 +19,8 @@ convierte y devuelve un `.md`. Un solo proceso sirve la API y el build de Astro.
 
 ## Despliegue en Kubernetes (blue/green sobre minikube)
 
-`k8s/manifest.yaml` define dos Deployments y un Service:
+`k8s/manifest.yaml` define un Namespace (`mdconverter`), dos Deployments y un Service. Todo
+queda en ese namespace:
 
 - **blue** — `mdconverter:v1`, imagen de `main`, sin OCR. 2 réplicas.
 - **green** — `mdconverter:v2`, imagen de `integrar-OCR`, con `ENABLE_OCR=1`. 2 réplicas.
@@ -30,7 +31,9 @@ Ambos contenedores escuchan en el 8000. El Service publica el 80 y apunta al 800
 
 ### 1. Construir las dos imágenes
 
-Cada versión sale de su rama. El `.` del final es el contexto de build.
+Cada versión sale de su rama. El `.` del final es el contexto de build. Necesitás el árbol
+limpio (`git status`): si tenés cambios sin commitear en archivos que difieren entre ramas,
+`git checkout` corta con «Aborting» y `docker build` te arma la imagen con la rama equivocada.
 
 ```bash
 git checkout main         && docker build -t mdconverter:v1 .
@@ -40,35 +43,29 @@ git checkout main
 
 ### 2. Cargar las imágenes en minikube
 
-minikube no ve el daemon local. Hay que meterle las imágenes, y quedan bajo el prefijo
-`localhost/` —por eso el manifest pide `localhost/mdconverter:v1` y `:v2`.
+minikube no ve el daemon local. Hay que meterle las imágenes.
 
 ```bash
 minikube image load mdconverter:v1
 minikube image load mdconverter:v2
-minikube image ls | grep mdconverter   # localhost/mdconverter:v1 y :v2
 ```
+
 
 ### 3. Aplicar el manifest
 
-El manifest no trae Namespace. Creá uno y dejalo como default de `kubectl` antes de aplicar,
-así el resto de los comandos van sin `-n`:
+El manifest trae el Namespace, así que `apply` lo crea y mete todo adentro:
 
 ```bash
-kubectl create namespace mdconverter
-kubectl config set-context --current --namespace=mdconverter
 kubectl apply -f k8s/manifest.yaml
-kubectl rollout status deploy/mdconverter-blue
-kubectl rollout status deploy/mdconverter-green
+kubectl rollout status deploy/mdconverter-blue -n mdconverter
+kubectl rollout status deploy/mdconverter-green -n mdconverter
 ```
-
-Para volver al namespace anterior: `kubectl config set-context --current --namespace=default`.
 
 Si actualizaste una imagen con el mismo tag, los pods viejos siguen con la anterior. Forzá el
 reemplazo:
 
 ```bash
-kubectl delete pod -l app=web
+kubectl delete pod -l app=web -n mdconverter
 ```
 
 ### 4. Probar cada versión
@@ -76,29 +73,27 @@ kubectl delete pod -l app=web
 El `port-forward` de un Deployment va al puerto del contenedor (8000):
 
 ```bash
-kubectl port-forward deploy/mdconverter-green 8080:8000
-kubectl port-forward deploy/mdconverter-blue  8081:8000
+kubectl port-forward deploy/mdconverter-green 8080:8000 -n mdconverter
+kubectl port-forward deploy/mdconverter-blue  8081:8000 -n mdconverter
 ```
 
 A través del Service, el puerto es el 80:
 
 ```bash
-kubectl port-forward svc/web 8080:80
+kubectl port-forward svc/web 8080:80 -n mdconverter
 ```
 
 ### 5. Cambiar el tráfico
 
 ```bash
-kubectl patch svc web -p '{"spec":{"selector":{"version":"green"}}}'   # pasar a green
-kubectl patch svc web -p '{"spec":{"selector":{"version":"blue"}}}'    # volver a blue
-kubectl describe service web | grep Selector                           # ver el color activo
+kubectl patch svc web -n mdconverter -p '{"spec":{"selector":{"version":"green"}}}'   # pasar a green
+kubectl patch svc web -n mdconverter -p '{"spec":{"selector":{"version":"blue"}}}'    # volver a blue
 ```
 
 ### Bajar todo
 
 ```bash
-kubectl delete -f k8s/manifest.yaml
-kubectl delete namespace mdconverter
+kubectl delete -f k8s/manifest.yaml   # borra el namespace y todo lo que tiene adentro
 ```
 
 ## Referencias

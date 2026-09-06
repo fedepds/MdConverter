@@ -1,8 +1,14 @@
-# Blue 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mdconverter
+---
+# Blue
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mdconverter-blue
+  namespace: mdconverter
 spec:
   replicas: 2
   selector:
@@ -17,7 +23,8 @@ spec:
     spec:
       containers:
         - name: web
-          image: localhost/mdconverter:v1
+          image: mdconverter:v1
+          imagePullPolicy: Never
           ports:
             - containerPort: 8000
           readinessProbe:
@@ -30,6 +37,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mdconverter-green
+  namespace: mdconverter
 spec:
   replicas: 2
   selector:
@@ -44,7 +52,8 @@ spec:
     spec:
       containers:
         - name: web
-          image: localhost/mdconverter:v2
+          image: mdconverter:v2
+          imagePullPolicy: Never
           ports:
             - containerPort: 8000
           env:
@@ -60,6 +69,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web
+  namespace: mdconverter
 spec:
   selector:
     app: web
