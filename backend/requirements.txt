@@ -2,3 +2,4 @@ fastapi
 uvicorn[standard]
 python-multipart
 markitdown[pdf,docx,pptx,xlsx,xls,outlook]
+rapidocr

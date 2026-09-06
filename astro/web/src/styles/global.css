@@ -265,6 +265,33 @@ body {
   flex-shrink: 0;
 }
 
+/* La clase .ocr la pone convert.js en el <html> cuando /api/limits dice que
+   el flag está prendido. Todo lo que el OCR da vuelta cuelga de acá: así el
+   marcado nunca afirma un OCR que el servidor no tiene. */
+
+/* Insignia y punto son el mismo lugar: uno o el otro, nunca los dos. */
+.pill-nuevo { display: none; }
+html.ocr .hero-dot { display: none; }
+
+html.ocr .pill-nuevo {
+  display: inline-block;
+  padding: 1px var(--spacing-xs);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--text-micro-legal-size);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* En el medianil, "imágenes" deja de ser una pérdida: se pinta con el azul
+   que el resto de la página reserva para lo que sí llegó. */
+html.ocr .gutter .field dd[data-lim="ocr_imagenes"] {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
 .display {
   font-family: var(--font-primary);
   font-weight: 600;

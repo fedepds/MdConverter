@@ -37,6 +37,7 @@ import { mdStats } from "./mdstats.js";
     .then((l) => {
       if (!l) return;
       limites = l;
+      document.documentElement.classList.toggle("ocr", l.ocr_enabled);
       f("hint").textContent =
         `o arrastralo acá · hasta ${l.max_file_size_mb} MB · ${l.allowed_extensions.join(" ")}`;
       for (const el of document.querySelectorAll("[data-lim]")) {
@@ -45,6 +46,23 @@ import { mdStats } from "./mdstats.js";
           timeout: `${l.convert_timeout_seconds} s`,
           formats: String(l.allowed_extensions.length),
           lista: l.allowed_extensions.join(" "),
+          ocr: l.ocr_enabled ? "activo" : "apagado",
+          pill: l.ocr_enabled
+            ? "Con OCR: un escaneo o una foto también dan texto"
+            : "Se convierte en este servidor · el archivo temporal se borra siempre",
+          titular: l.ocr_enabled
+            ? "Convertí un documento o un escaneo a Markdown limpio"
+            : "Convertí un documento a Markdown limpio",
+          bajada: l.ocr_enabled
+            ? "La conversión ocurre en este servidor con la librería MarkItDown de Microsoft. El OCR también: RapidOCR corre acá, con los modelos adentro de la imagen. Nada se manda a un tercero, y el archivo temporal se borra siempre."
+            : "La conversión ocurre en este servidor con la librería MarkItDown de Microsoft. Nada se manda a un tercero, y el archivo temporal se borra siempre.",
+          ocr_red: l.ocr_enabled
+            ? "Ni la conversión ni el OCR abren conexiones. Hay dos chequeos que lo comprueban: bloquean los sockets, convierten y leen, y fallan si algo intenta salir. En el contenedor corren directamente sin red."
+            : "La conversión no abre conexiones. Hay un chequeo que lo comprueba: bloquea los sockets, convierte varios formatos y falla si MarkItDown intenta salir. En el contenedor corre directamente sin red.",
+          ocr_imagenes: l.ocr_enabled ? "las lee el OCR" : "no se extrae su texto",
+          ocr_detalle: l.ocr_enabled
+            ? "El OCR corre acá mismo, con modelos que viajan dentro de la imagen: un PDF escaneado sí da texto."
+            : "El costo es real — un PDF escaneado es imagen de texto y no produce texto.",
         }[el.dataset.lim];
         if (v) el.textContent = v;
       }
@@ -170,7 +188,9 @@ import { mdStats } from "./mdstats.js";
       } else if (peticion.status === 422) {
         fallar(
           "MarkItDown no pudo convertir este archivo.",
-          "Si es un PDF escaneado, son imágenes de texto: esta versión no hace OCR, así que no hay texto que extraer. Si no, puede estar dañado o protegido con contraseña.",
+          limites?.ocr_enabled
+            ? "Ni MarkItDown ni el OCR sacaron texto: puede estar dañado, protegido con contraseña, o ser un escaneo que el OCR no llegó a leer."
+            : "Si es un PDF escaneado, son imágenes de texto: esta versión no hace OCR, así que no hay texto que extraer. Si no, puede estar dañado o protegido con contraseña.",
           true,
         );
       } else if (peticion.status === 504) {

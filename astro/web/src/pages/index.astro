@@ -36,19 +36,19 @@ import "../styles/global.css";
     <main class="page">
       <section class="hero">
         <p class="hero-pill">
-          <span class="hero-dot" aria-hidden="true"></span>
-          Se convierte en este servidor · el archivo temporal se borra siempre
+          <span class="hero-dot" aria-hidden="true"></span><span class="pill-nuevo">nuevo</span><span data-lim="pill">Se convierte en este servidor · el archivo temporal se borra siempre</span>
         </p>
-        <h1 class="display">Convertí un documento a Markdown limpio</h1>
-        <p class="lede">
+        <h1 class="display" data-lim="titular">Convertí un documento a Markdown limpio</h1>
+        <p class="lede" data-lim="bajada">
           La conversión ocurre en este servidor con la librería MarkItDown de
-          Microsoft. Sin OCR ni IA, y el archivo temporal se borra siempre.
+          Microsoft. Nada se manda a un tercero, y el archivo temporal se borra siempre.
         </p>
 
         <p class="head-meta">
           <span>tamaño máximo <b data-lim="size">—</b></span>
           <span>timeout <b data-lim="timeout">—</b></span>
           <span>formatos <b data-lim="formats">—</b></span>
+          <span>OCR <b data-lim="ocr">—</b></span>
         </p>
       </section>
 
@@ -88,7 +88,7 @@ import "../styles/global.css";
               <li>
                 <details>
                   <summary><Icon name="ban" />nada sale a la red<Icon name="chevron" class="chev" /></summary>
-                  <p>
+                  <p data-lim="ocr_red">
                     La conversión no abre conexiones. Hay un chequeo que lo comprueba:
                     bloquea los sockets, convierte varios formatos y falla si MarkItDown
                     intenta salir. En el contenedor corre directamente sin red.
@@ -97,11 +97,10 @@ import "../styles/global.css";
               </li>
               <li>
                 <details>
-                  <summary><Icon name="eye-off" />sin OCR ni IA<Icon name="chevron" class="chev" /></summary>
+                  <summary><Icon name="eye-off" />sin servicios externos<Icon name="chevron" class="chev" /></summary>
                   <p>
-                    Ningún modelo mira tu archivo: no hay <code>llm_client</code>, ni
-                    plugins, ni Document Intelligence. El costo es real — un PDF
-                    escaneado es imagen de texto y no produce texto.
+                    Ningún servicio de afuera ve tu archivo: no hay <code>llm_client</code>, ni
+                    plugins, ni Document Intelligence. <span data-lim="ocr_detalle">—</span>
                   </p>
                 </details>
               </li>

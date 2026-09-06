@@ -10,7 +10,9 @@ RUN pnpm install --frozen-lockfile && pnpm run build
 FROM python:3.13-slim
 WORKDIR /app/backend
 COPY backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip uninstall -y opencv-python \
+    && pip install --no-cache-dir opencv-python-headless
 COPY backend/ ./
 COPY --from=web /web/dist /app/astro/web/dist
 

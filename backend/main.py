@@ -1,6 +1,7 @@
 """API para convertir archivos a Markdown con MarkItDown.
 
-Sin OCR ni IA: sin llm_client, sin plugins, sin Azure Document Intelligence.
+Sin IA ni OCR remoto: sin llm_client, sin plugins, sin Azure Document
+Intelligence. El OCR es local y va detras del flag ENABLE_OCR (ver ocr.py).
 """
 
 import asyncio
@@ -14,10 +15,16 @@ from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from markitdown import MarkItDown
 
+import ocr
+
 ALLOWED_EXTENSIONS = {
     ".pdf", ".docx", ".pptx", ".xlsx", ".xls", ".html", ".htm",
     ".csv", ".json", ".xml", ".zip", ".epub", ".txt", ".msg",
 }
+
+# Las imagenes solo entran si hay con que leerlas.
+if ocr.ENABLE_OCR:
+    ALLOWED_EXTENSIONS |= ocr.EXTENSIONES_IMAGEN
 
 MAX_FILE_SIZE_MB = int(os.getenv("MAX_FILE_SIZE_MB", "25"))
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
@@ -36,6 +43,18 @@ def safe_stem(filename: str) -> str:
     return stem[:100] or "converted"
 
 
+def convertir(path: str, ext: str) -> str:
+    """Elige camino segun la extension. Bloqueante: va en asyncio.to_thread."""
+    if ocr.ENABLE_OCR and ext in ocr.EXTENSIONES_IMAGEN:
+        return ocr.imagen(path)
+
+    texto = md.convert_local(path).text_content
+    # Un PDF escaneado sale vacio de pdfminer: recien ahi vale gastar CPU en OCR.
+    if ocr.ENABLE_OCR and ext == ".pdf" and not texto.strip():
+        return ocr.pdf(path)
+    return texto
+
+
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
@@ -52,6 +71,7 @@ async def limits():
         "max_file_size_mb": MAX_FILE_SIZE_MB,
         "convert_timeout_seconds": CONVERT_TIMEOUT_SECONDS,
         "allowed_extensions": sorted(ALLOWED_EXTENSIONS),
+        "ocr_enabled": ocr.ENABLE_OCR,
     }
 
 
@@ -81,17 +101,17 @@ async def convert(file: UploadFile = File(...)):
             raise HTTPException(400, "El archivo esta vacio")
 
         try:
-            result = await asyncio.wait_for(
-                asyncio.to_thread(md.convert_local, str(path)),
+            texto = await asyncio.wait_for(
+                asyncio.to_thread(convertir, str(path), ext),
                 timeout=CONVERT_TIMEOUT_SECONDS,
             )
         except asyncio.TimeoutError:
             raise HTTPException(504, f"La conversion supero los {CONVERT_TIMEOUT_SECONDS} s")
         except Exception as exc:
-            raise HTTPException(422, f"MarkItDown no pudo convertir el archivo: {exc}")
+            raise HTTPException(422, f"No se pudo convertir el archivo: {exc}")
 
     return Response(
-        content=result.text_content,
+        content=texto,
         media_type="text/markdown; charset=utf-8",
         headers={"Content-Disposition": f'attachment; filename="{safe_stem(file.filename)}.md"'},
     )

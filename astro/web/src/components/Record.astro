@@ -13,7 +13,7 @@ const ENTRADA = [
 const PERDIDA = [
   { icon: "eye-off", label: "formato visual", valor: "negritas, tipografías, colores" },
   { icon: "heading", label: "paginación", valor: "saltos de página, encabezados" },
-  { icon: "file", label: "imágenes", valor: "no se extrae su texto" },
+  { icon: "scan", label: "imágenes", valor: "—", lim: "ocr_imagenes" },
 ];
 
 const SALIDA = [
@@ -54,10 +54,10 @@ const SALIDA = [
   <div class="gutter">
     <h2 class="gutter-label">Pérdida — esperada</h2>
     <dl class="fields">
-      {PERDIDA.map(({ icon, label, valor }) => (
+      {PERDIDA.map(({ icon, label, valor, lim }) => (
         <div class="field">
           <dt><Icon name={icon} />{label}</dt>
-          <dd>{valor}</dd>
+          <dd data-lim={lim}>{valor}</dd>
         </div>
       ))}
     </dl>
